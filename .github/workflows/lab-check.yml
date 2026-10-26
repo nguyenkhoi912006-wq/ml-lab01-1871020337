@@ -1,0 +1,40 @@
+name: Lab 01 Check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lab-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Download dataset
+        run: |
+          python scripts/download_data.py
+
+      - name: Check required files and notebook structure
+        run: |
+          python tests/check_lab01.py
+
+      - name: Execute notebook
+        run: |
+          jupyter nbconvert \
+            --to notebook \
+            --execute Lab01_StudentPerformance.ipynb \
+            --output executed_Lab01_StudentPerformance.ipynb \
+            --ExecutePreprocessor.timeout=180
